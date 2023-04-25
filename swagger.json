@@ -1,0 +1,276 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "API de Produtos",
+    "description": "API de Produtos usando Express e MongoDB",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "paths": {
+    "/produtos": {
+      "post": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Criação de um novo Produto",
+        "description": "",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "formData",
+            "description": "Nome do produto",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "descricao",
+            "in": "formData",
+            "description": "Descrição do produto",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "quantidade",
+            "in": "formData",
+            "description": "Quantidade do produto",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "preco",
+            "in": "formData",
+            "description": "Preço do produto",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "desconto",
+            "in": "formData",
+            "description": "Desconto do produto",
+            "required": true,
+            "type": "number"
+          },
+          {
+            "name": "dataDesconto",
+            "in": "formData",
+            "description": "Data do desconto",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "categoria",
+            "in": "formData",
+            "description": "Categoria do produto",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "imagem",
+            "in": "formData",
+            "description": "Imagem do produto",
+            "required": true,
+            "type": "file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto criado com sucesso"
+          },
+          "500": {
+            "description": "Um erro aconteceu"
+          }
+        }
+      },
+      "/produtos": {
+  "get": {
+    "tags": [
+      "Produtos"
+    ],
+    "summary": "Listagem de todos os Produtos",
+    "description": "Retorna uma lista de todos os produtos cadastrados no sistema.",
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "name": "nome",
+        "in": "query",
+        "description": "Filtro por nome dos produtos.",
+        "required": false,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Produtos encontrados com sucesso",
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Produto"
+          }
+        }
+      },
+      "500": {
+        "description": "Um erro aconteceu"
+      }
+    }
+  }
+},
+"/produtos/{id}": {
+  "get": {
+    "tags": [
+      "Produtos"
+    ],
+    "summary": "Busca um Produto pelo ID",
+    "description": "",
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "description": "ID do produto a ser buscado",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "ObjectId"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Produto encontrado com sucesso"
+      },
+      "404": {
+        "description": "Produto não encontrado"
+      },
+      "500": {
+        "description": "Um erro aconteceu"
+      }
+    }
+  }
+},
+"paths": {
+    "/produtos/{id}": {
+      "get": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Busca um produto pelo ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID do produto a ser buscado",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Produtos"
+        ],
+        "summary": "Atualiza um produto pelo ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID do produto a ser atualizado",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Dados do produto a ser atualizado",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProdutoInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produto atualizado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          },
+          "500": {
+            "description": "Erro interno do servidor"
+          }
+        }
+      }
+    }
+  },
+  "/produtos/:id": {
+   "delete": {
+    "tags": [
+      "Produtos"
+    ],
+    "summary": "Remoção de um Produto",
+    "description": "",
+    "produces": [
+      "application/json"
+    ],
+    "parameters": [
+      {
+        "name": "id",
+        "in": "path",
+        "description": "ID do produto a ser removido",
+        "required": true,
+        "type": "string"
+      },
+      {
+        "name": "categoria",
+        "in": "query",
+        "description": "Categoria do produto a ser excluído, se desejar excluir todos os produtos com essa categoria",
+        "required": false,
+        "type": "string"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Produto(s) excluído(s) com sucesso"
+      },
+      "404": {
+        "description": "Produto(s) não encontrado(s)"
+      },
+      "500": {
+        "description": "Um erro aconteceu"
+       }
+        }
+      }
+    }
+  }
+  }
+}
