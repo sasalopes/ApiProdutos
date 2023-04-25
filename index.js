@@ -57,35 +57,45 @@ app.post("/produtos",  upload.single('imagem'), async (req, res) => {
 });
 
     // Listagem de um Produto especifico (GET)
-    app.get("/produtos/:id", async (req,res) => {
-        try{
-            const {id} = req.params;
-            const produtoExistente = await Produto.findById(id);
-      
-        if(produtoExistente){
-            res.json(produtoExistente);
-      
-          }else{
-            res.status(404).json({message: "Produto não encontrado"})
-          }
-      
-        } catch(err){
-          console.log(err);
-          res.status(500).json({message: "Um erro aconteceu"});
-      
-        }
-      });
+   app.get("/produtos/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nome } = req.query; // Recupera o parâmetro "nome" da querystring
 
+    let filtro = { _id: id };
+    if (nome) {
+      filtro.nome = nome;
+    }
+
+    const produtoExistente = await Produto.findOne(filtro);
+
+    if (produtoExistente) {
+      res.json(produtoExistente);
+    } else {
+      res.status(404).json({ message: "Produto não encontrado" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Um erro aconteceu" });
+  }
+});
    
  // Atualização de um Produto (PUT)
  app.put("/produtos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const {nome, descrição, quantidade, preço, desconto, dataDesconto, categoria, imagem} = req.body;
+    const { quantidade, preço } = req.body;
 
-    const produtoExistente = await Produto.findByIdAndUpdate(id, {
-      nome, descrição, quantidade, preço, desconto, dataDesconto, categoria, imagem
-    });
+    const filtro = { _id: id };
+    const update = {};
+    if (quantidade) {
+      update.quantidade = quantidade;
+    }
+    if (preço) {
+      update.preço = preço;
+    }
+
+    const produtoExistente = await Produto.findByIdAndUpdate(filtro, update);
 
     if (produtoExistente) {
       res.json({ message: "Produto editado." });
