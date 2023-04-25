@@ -34,37 +34,60 @@ const upload = multer({ storage:storage});
 // Criação de um novo Produto
 app.post("/produtos",  upload.single('imagem'), async (req, res) => {
   try {
-
     const {nome, descricao, quantidade, preco, desconto, dataDesconto, categoria} = req.body;
+
+    // Validando campos com if
+    if (!nome || !descricao || quantidade < 0 || preco < 0) {
+      return res.status(400).json({ message: "Dados inválidos." });
+    }
+
     const produto = new Produto ({nome, descricao, quantidade, preco, desconto, dataDesconto, categoria, imagem: req.file.filename});
     await produto.save();
-  res.json(produto)
- } catch (err) {
-  console.log(err);
-  res.status(500).json({ message: "Um erro aconteceu." });
-}
+    res.json(produto)
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Um erro aconteceu." });
+  }
 });
 
 // Listagem de todos os Produtos
- app.get("/produtos", async (req,res) => {
+app.get("/produtos", async (req, res) => {
+  try {
     const { nome } = req.query;
+    if (nome && typeof nome !== 'string') {
+      throw new Error('O parâmetro "nome" deve ser uma string.');
+    }
     const filtro = {};
     if (nome) {
-        filtro.nome = { $regex: nome, $options: "i" };
+      filtro.nome = { $regex: nome, $options: "i" };
     }
     const produtos = await Produto.find(filtro);
     res.json(produtos);
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ message: err.message });
+  }
 });
 
     // Listagem de um Produto especifico (GET)
-   app.get("/produtos/:id", async (req, res) => {
+  app.get("/produtos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { nome } = req.query; // Recupera o parâmetro "nome" da querystring
+    const { nome } = req.query;
+
+    // Verifica se o ID é válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+
+    // Verifica se o parâmetro "nome" é uma string válida
+    if (nome && typeof nome !== "string") {
+      return res.status(400).json({ message: "O parâmetro 'nome' deve ser uma string" });
+    }
 
     let filtro = { _id: id };
     if (nome) {
-      filtro.nome = nome;
+      filtro.nome = { $regex: nome, $options: "i" };
     }
 
     const produtoExistente = await Produto.findOne(filtro);
@@ -86,12 +109,22 @@ app.post("/produtos",  upload.single('imagem'), async (req, res) => {
     const { id } = req.params;
     const { quantidade, preço } = req.body;
 
+    // Verifica se quantidade é um número positivo
+    if (quantidade !== undefined && (!Number.isInteger(quantidade) || quantidade <= 0)) {
+      return res.status(400).json({ message: "Quantidade inválida." });
+    }
+
+    // Verifica se preço é um número positivo
+    if (preço !== undefined && (!Number.isFinite(preço) || preço <= 0)) {
+      return res.status(400).json({ message: "Preço inválido." });
+    }
+
     const filtro = { _id: id };
     const update = {};
-    if (quantidade) {
+    if (quantidade !== undefined) {
       update.quantidade = quantidade;
     }
-    if (preço) {
+    if (preço !== undefined) {
       update.preço = preço;
     }
 
@@ -112,15 +145,23 @@ app.post("/produtos",  upload.single('imagem'), async (req, res) => {
 app.delete("/produtos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const { categoria } = req.query; // obter categoria da query
+    const { categoria } = req.query;
+
+    // Verifica se o ID é uma string válida de ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "ID inválido." });
+    }
+
+    // Verifica se a categoria é uma string válida
+    if (categoria && typeof categoria !== "string") {
+      return res.status(400).json({ message: "Categoria inválida." });
+    }
 
     let produtoExistente;
 
     if (categoria) {
-      // se a categoria estiver definida na query, exclui todos os produtos com essa categoria
       produtoExistente = await Produto.deleteMany({ categoria });
     } else {
-      // caso contrário, exclui apenas o produto com o ID fornecido
       produtoExistente = await Produto.findByIdAndRemove(id);
     }
 
