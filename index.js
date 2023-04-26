@@ -180,4 +180,3 @@ app.delete("/produtos/:id", async (req, res) => {
 app.listen(7000, () => {
     console.log("Servidor rodando em http://localhost:7000/");
 });
-swaggerUtils.applyTagsMetadata(app, "/produtos/:id", "delete", "Produtos", "Remoção de um Produto");

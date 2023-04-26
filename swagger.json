@@ -84,92 +84,103 @@
           }
         }
       },
-      "/produtos": {
-  "get": {
-    "tags": [
-      "Produtos"
-    ],
-    "summary": "Listagem de todos os Produtos",
-    "description": "Retorna uma lista de todos os produtos cadastrados no sistema.",
-    "produces": [
-      "application/json"
-    ],
-    "parameters": [
-      {
-        "name": "nome",
-        "in": "query",
-        "description": "Filtro por nome dos produtos.",
-        "required": false,
-        "type": "string"
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Produtos encontrados com sucesso",
-        "schema": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Produto"
+
+"get": {
+        "summary": "Listagem de produtos",
+        "description": "Retorna uma lista de todos os produtos cadastrados no sistema",
+        "tags": ["Produtos"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
           }
         }
-      },
-      "500": {
-        "description": "Um erro aconteceu"
       }
-    }
-  }
-},
-"/produtos/{id}": {
-  "get": {
-    "tags": [
-      "Produtos"
-    ],
-    "summary": "Busca um Produto pelo ID",
-    "description": "",
-    "produces": [
-      "application/json"
-    ],
-    "parameters": [
-      {
-        "name": "id",
-        "in": "path",
-        "description": "ID do produto a ser buscado",
-        "required": true,
-        "schema": {
-          "type": "string",
-          "format": "ObjectId"
-        }
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Produto encontrado com sucesso"
-      },
-      "404": {
-        "description": "Produto não encontrado"
-      },
-      "500": {
-        "description": "Um erro aconteceu"
-      }
-    }
-  }
-},
-"paths": {
+    },
     "/produtos/{id}": {
       "get": {
-        "tags": [
-          "Produtos"
-        ],
-        "summary": "Busca um produto pelo ID",
+        "summary": "Busca produtos por ID",
+        "description": "ID do produto a ser buscado",
+        "tags": ["Produtos"],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID do produto a ser buscado",
             "required": true,
-            "schema": {
-              "type": "string"
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualizar Produto",
+        "description": "Atualiza o produto no banco de dados",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Produto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/Produto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Um erro ocorreu"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remoção de um Produto",
+        "description": "Exclui um produto do banco de dados utilizando o ID",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
           }
         ],
         "responses": {
@@ -178,99 +189,118 @@
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
                   "$ref": "#/components/schemas/Produto"
                 }
               }
             }
           },
+          "500": {
+            "description": "Um erro ocorreu"
+          },
           "404": {
             "description": "Produto não encontrado"
-          },
-          "500": {
-            "description": "Erro interno do servidor"
           }
         }
-      },
-      "put": {
-        "tags": [
-          "Produtos"
+      }
+    },
+    "/buscanome": {
+      "get": {
+        "summary": "Busca de nome",
+        "description": "Busca o nome do produto (case insensitive)",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "nome",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
         ],
-        "summary": "Atualiza um produto pelo ID",
+        "responses": {
+          "200": {
+            "description": "Produto achado com sucesso"
+          },
+          "404": {
+            "description": "Produto com este nome não encontrado"
+          },
+          "500": {
+            "description": "Erro desconhecido"
+          }
+        }
+      }
+    },
+    "/buscacategoria": {
+      "get": {
+        "summary": "Busca por Categoria",
+        "description": "Busca um produto que se enquadra numa categoria específica. (case insensitive)",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "categoria",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto achado com sucesso"
+          },
+          "404": {
+            "description": "Produto não encontrado com esta categoria"
+          },
+          "500": {
+            "description": "Erro desconhecido"
+          }
+        }
+      }
+    },
+    "/buscaId": {
+      "get": {
+        "summary": "Busca pelo Id e nome",
+        "description": "Busca o produto pelo seu id e nome",
+        "tags": ["Produtos"],
         "parameters": [
           {
             "name": "id",
-            "in": "path",
-            "description": "ID do produto a ser atualizado",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" }
           }
         ],
-        "requestBody": {
-          "description": "Dados do produto a ser atualizado",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProdutoInput"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": "Produto atualizado com sucesso"
+            "description": "Produto achado com sucesso"
           },
           "404": {
-            "description": "Produto não encontrado"
+            "description": "ID inválido"
           },
           "500": {
-            "description": "Erro interno do servidor"
+            "description": "O parâmetro 'nome' deve ser uma string"
           }
         }
       }
     }
   },
-  "/produtos/:id": {
-   "delete": {
-    "tags": [
-      "Produtos"
-    ],
-    "summary": "Remoção de um Produto",
-    "description": "",
-    "produces": [
-      "application/json"
-    ],
-    "parameters": [
-      {
-        "name": "id",
-        "in": "path",
-        "description": "ID do produto a ser removido",
-        "required": true,
-        "type": "string"
-      },
-      {
-        "name": "categoria",
-        "in": "query",
-        "description": "Categoria do produto a ser excluído, se desejar excluir todos os produtos com essa categoria",
-        "required": false,
-        "type": "string"
-      }
-    ],
-    "responses": {
-      "200": {
-        "description": "Produto(s) excluído(s) com sucesso"
-      },
-      "404": {
-        "description": "Produto(s) não encontrado(s)"
-      },
-      "500": {
-        "description": "Um erro aconteceu"
-       }
+  "components": {
+    "schemas": {
+      "Produto": {
+        "type": "object",
+        "properties": {
+          "nome": { "type": "string" },
+          "descricao": { "type": "string" },
+          "quantidade": { "type": "integer" },
+          "preco": { "type": "integer" },
+          "desconto": { "type": "integer" },
+          "dataDesconto": { "type": "string" },
+          "categoria": { "type": "string" },
+          "imagem": {
+            "type": "string",
+            "description": "A imagem será uma imagem real que será convertida em uma string no banco de dados"
+          }
         }
       }
     }
-  }
   }
 }
